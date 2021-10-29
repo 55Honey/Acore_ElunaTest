@@ -14,10 +14,13 @@ If the directory was not changed in the ElunaLua config, add the .lua script to 
 
 ## Admin Usage:
 
+- Trigger the events listed below.
+- Receive a message in the worldserver console whenever a hook fires.
+
 Commands:
 
-`luatest` to list all events which weren't tested in this session.
-`resetluatest` to start an new session.
+- `luatest` to list all events which weren't tested in this session.
+- `resetluatest` to start an new session.
 
 
 ## Currently listed events:
