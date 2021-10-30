@@ -22,6 +22,10 @@ Commands:
 - `luatest` to list all events which weren't tested in this session.
 - `resetluatest` to start an new session.
 
+![image](https://user-images.githubusercontent.com/71938210/139537206-365dff58-72f4-4a6b-8975-7f02ccf5dbbf.png)
+![image](https://user-images.githubusercontent.com/71938210/139537239-442bb08b-691c-480f-92a7-4c45c97e9500.png)
+
+
 
 ## Currently listed events:
 
