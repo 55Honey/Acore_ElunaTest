@@ -62,11 +62,13 @@ PLAYER_EVENT_ON_PET_SPAWNED = 43            --(event, player, pet)
 
 
 local functionTested = {}
+local status_EVENT = {}
 local n
 
 --init all functions untested
 for n = 1,43,1 do
     functionTested[n] = 0
+    status_EVENT[n] = nil
 end
 --hardcoded marking as done what doesn't exist
 functionTested[40] = 1
@@ -75,204 +77,329 @@ functionTested[41] = 1
 
 local function function_PLAYER_EVENT_ON_CHARACTER_CREATE(event, player)
     functionTested[1] = 1
-    print('PLAYER_EVENT_ON_CHARACTER_CREATE has fired')
+    print('PLAYER_EVENT_ON_CHARACTER_CREATE has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_CHARACTER_DELETE(event, guid)
     functionTested[2] = 1
-    print('PLAYER_EVENT_ON_CHARACTER_DELETE has fired')
+    print('PLAYER_EVENT_ON_CHARACTER_DELETE has fired:')
+    print('event: '..event..'  playername: '..guid())
 end
 
 local function function_PLAYER_EVENT_ON_LOGIN(event, player)
     functionTested[3] = 1
-    print('PLAYER_EVENT_ON_LOGIN has fired')
+    print('PLAYER_EVENT_ON_LOGIN has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_LOGOUT(event, player)
     functionTested[4] = 1
-    print('PLAYER_EVENT_ON_LOGOUT has fired')
+    print('PLAYER_EVENT_ON_LOGOUT has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_SPELL_CAST(event, player, spell, skipCheck)
     functionTested[5] = 1
-    print('PLAYER_EVENT_ON_SPELL_CAST has fired')
+    print('PLAYER_EVENT_ON_SPELL_CAST has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_KILL_PLAYER(event, killer, killed)
     functionTested[6] = 1
-    print('PLAYER_EVENT_ON_KILL_PLAYER has fired')
+    print('PLAYER_EVENT_ON_KILL_PLAYER has fired:')
+    print('event: '..event..'  killer: '..killer:GetName()..'  killed: '..killed:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_KILL_CREATURE(event, killer, killed)
     functionTested[7] = 1
-    print('PLAYER_EVENT_ON_KILL_CREATURE has fired')
+    print('PLAYER_EVENT_ON_KILL_CREATURE has fired:')
+    print('event: '..event..'  killer: '..killer:GetName()..'  killed: '..killed:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_KILLED_BY_CREATURE(event, killer, killed)
     functionTested[8] = 1
-    print('PLAYER_EVENT_ON_KILLED_BY_CREATURE has fired')
+    print('PLAYER_EVENT_ON_KILLED_BY_CREATURE has fired:')
+    print('event: '..event..'  killer: '..killer:GetName()..'  killed: '..killed:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_DUEL_REQUEST(event, target, challenger)
     functionTested[9] = 1
-    print('PLAYER_EVENT_ON_DUEL_REQUEST has fired')
+    print('PLAYER_EVENT_ON_DUEL_REQUEST has fired:')
+    print('event: '..event..'  target: '..target:GetName()..'  challenger: '..challenegr:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_DUEL_START(event, player1, player2)
     functionTested[10] = 1
-    print('PLAYER_EVENT_ON_DUEL_START has fired')
+    print('PLAYER_EVENT_ON_DUEL_START has fired:')
+    print('event: '..event..'  player1: '..player1:GetName()..'  player2: '..player2:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_DUEL_END(event, winner, loser, type)
     functionTested[11] = 1
-    print('PLAYER_EVENT_ON_DUEL_END has fired')
+    print('PLAYER_EVENT_ON_DUEL_END has fired:')
+    print('event: '..event..'  winnder: '..winner:GetName()..'  loser: '..loser:GetName()..'  type: '..type)
 end
 
 local function function_PLAYER_EVENT_ON_GIVE_XP(event, player, amount, victim) -- Can return new XP amount
     functionTested[12] = 1
-    print('PLAYER_EVENT_ON_GIVE_XP has fired')
+    print('PLAYER_EVENT_ON_GIVE_XP has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
+    print('amount: '..amount..'  killed: '..victim:GetName())
+    print('Overriding xp amount to 123')
+    return 123
 end
 
 local function function_PLAYER_EVENT_ON_LEVEL_CHANGE(event, player, oldLevel)
     functionTested[13] = 1
-    print('PLAYER_EVENT_ON_LEVEL_CHANGE has fired')
+    print('PLAYER_EVENT_ON_LEVEL_CHANGE has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
+    print('oldLevel: '..oldLevel)
 end
 
 local function function_PLAYER_EVENT_ON_MONEY_CHANGE(event, player, amount) -- Can return new money amount
     functionTested[14] = 1
-    print('PLAYER_EVENT_ON_MONEY_CHANGE has fired')
+    print('PLAYER_EVENT_ON_MONEY_CHANGE has fired:')
+    print('event: '..event..'  playername: '..player:GetName()..'  amount: '..amount)
+    print('Overriding money amount to 1g23s45c')
+    return 12345
 end
 
 local function function_PLAYER_EVENT_ON_REPUTATION_CHANGE(event, player, factionId, standing, incremental) -- Can return new standing
     functionTested[15] = 1
-    print('PLAYER_EVENT_ON_REPUTATION_CHANGE has fired')
+    print('PLAYER_EVENT_ON_REPUTATION_CHANGE has fired:')
+    print('event: '..event..'  playername: '..player:GetName()..'  factionId: '..factionId..'  standing: '..standing..'  incremental: '..incremental)
+    print('Overriding standing to 50')
+    return 50
 end
 
 local function function_PLAYER_EVENT_ON_TALENTS_CHANGE(event, player, points)
     functionTested[16] = 1
-    print('PLAYER_EVENT_ON_TALENTS_CHANGE has fired')
+    print('PLAYER_EVENT_ON_TALENTS_CHANGE has fired:')
+    print('event: '..event..'  playername: '..player:GetName()..'  points: '..points)
 end
 
 local function function_PLAYER_EVENT_ON_TALENTS_RESET(event, player, noCost)
     functionTested[17] = 1
-    print('PLAYER_EVENT_ON_TALENTS_RESET has fired')
+    print('PLAYER_EVENT_ON_TALENTS_RESET has fired:')
+    print('event: '..event..'  playername: '..player:GetName()..'  noCost: '..noCost)
 end
 
 local function function_PLAYER_EVENT_ON_CHAT(event, player, msg, Type, lang) -- Can return false, newMessage
-    functionTested[18] = 1
-    print('PLAYER_EVENT_ON_CHAT has fired')
+    print('PLAYER_EVENT_ON_CHAT has fired:')
+    print('event: '..event..'  playername: '..player:GetName()..'  msg: '..msg..'  Type: '..Type..'  lang: '..lang)
+    if status_EVENT[18] == nil then
+        status_EVENT[18] = 1
+        print('1st test: return false')
+        return false
+    else
+        if status_EVENT[18] == 1 then
+            status_EVENT[18] = status_EVENT[18] + 1
+            print('1st test: return false')
+            return false
+        elseif status_EVENT[18] == 2 then
+            status_EVENT[18] = status_EVENT[18] + 1
+            functionTested[18] = 1
+            print('2nd test: return "Testmessage"')
+            return 'Testmessage'
+        end
+    end
 end
 
 local function function_PLAYER_EVENT_ON_WHISPER(event, player, msg, Type, lang, receiver) -- Can return false, newMessage
-    functionTested[19] = 1
-    print('PLAYER_EVENT_ON_WHISPER has fired')
+    print('PLAYER_EVENT_ON_WHISPER has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
+    if status_EVENT[19] == nil then
+        status_EVENT[19] = 1
+        print('1st test: return false')
+        return false
+    else
+        if status_EVENT[19] == 1 then
+            status_EVENT[19] = status_EVENT[19] + 1
+            print('1st test: return false')
+            return false
+        elseif status_EVENT[19] == 2 then
+            status_EVENT[19] = status_EVENT[19] + 1
+            functionTested[19] = 1
+            print('2nd test: return "Testmessage"')
+            return 'Testmessage'
+        end
+    end
 end
 
 local function function_PLAYER_EVENT_ON_GROUP_CHAT(event, player, msg, Type, lang, group) -- Can return false, newMessage
-    functionTested[20] = 1
-    print('PLAYER_EVENT_ON_GROUP_CHAT has fired')
+    print('PLAYER_EVENT_ON_GROUP_CHAT has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
+    if status_EVENT[20] == nil then
+        status_EVENT[20] = 1
+        print('1st test: return false')
+        return false
+    else
+        if status_EVENT[20] == 1 then
+            status_EVENT[20] = status_EVENT[20] + 1
+            print('1st test: return false')
+            return false
+        elseif status_EVENT[20] == 2 then
+            status_EVENT[20] = status_EVENT[20] + 1
+            functionTested[20] = 1
+            print('2nd test: return "Testmessage"')
+            return 'Testmessage'
+        end
+    end
 end
 
 local function function_PLAYER_EVENT_ON_GUILD_CHAT(event, player, msg, Type, lang, guild) -- Can return false, newMessage
-    functionTested[21] = 1
-    print('PLAYER_EVENT_ON_GUILD_CHAT has fired')
+    print('PLAYER_EVENT_ON_GUILD_CHAT has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
+    if status_EVENT[21] == nil then
+        status_EVENT[21] = 1
+        print('1st test: return false')
+        return false
+    else
+        if status_EVENT[21] == 1 then
+            status_EVENT[21] = status_EVENT[21] + 1
+            print('1st test: return false')
+            return false
+        elseif status_EVENT[21] == 2 then
+            status_EVENT[21] = status_EVENT[21] + 1
+            functionTested[21] = 1
+            print('2nd test: return "Testmessage"')
+            return 'Testmessage'
+        end
+    end
 end
 
 local function function_PLAYER_EVENT_ON_CHANNEL_CHAT(event, player, msg, Type, lang, channel) -- Can return false, newMessage
-    functionTested[22] = 1
-    print('PLAYER_EVENT_ON_CHANNEL_CHAT has fired')
+    print('PLAYER_EVENT_ON_CHANNEL_CHAT has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
+    if status_EVENT[22] == nil then
+        status_EVENT[22] = 1
+        print('1st test: return false')
+        return false
+    else
+        if status_EVENT[22] == 1 then
+            status_EVENT[22] = status_EVENT[22] + 1
+            print('1st test: return false')
+            return false
+        elseif status_EVENT[22] == 2 then
+            status_EVENT[22] = status_EVENT[22] + 1
+            functionTested[22] = 1
+            print('2nd test: return "Testmessage"')
+            return 'Testmessage'
+        end
+    end
 end
 
 local function function_PLAYER_EVENT_ON_EMOTE(event, player, emote) -- Not triggered on any known emote
     functionTested[23] = 1
-    print('PLAYER_EVENT_ON_EMOTE has fired')
+    print('PLAYER_EVENT_ON_EMOTE has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_TEXT_EMOTE(event, player, textEmote, emoteNum, guid)
     functionTested[24] = 1
-    print('PLAYER_EVENT_ON_TEXT_EMOTE has fired')
+    print('PLAYER_EVENT_ON_TEXT_EMOTE has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_SAVE(event, player)
     functionTested[25] = 1
-    print('PLAYER_EVENT_ON_SAVE has fired')
+    print('PLAYER_EVENT_ON_SAVE has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_BIND_TO_INSTANCE(event, player, difficulty, mapid, permanent)
     functionTested[26] = 1
-    print('PLAYER_EVENT_ON_BIND_TO_INSTANCE has fired')
+    print('PLAYER_EVENT_ON_BIND_TO_INSTANCE has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_UPDATE_ZONE(event, player, newZone, newArea)
     functionTested[27] = 1
-    print('PLAYER_EVENT_ON_UPDATE_ZONE has fired')
+    print('PLAYER_EVENT_ON_UPDATE_ZONE has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_MAP_CHANGE(event, player)
     functionTested[28] = 1
-    print('PLAYER_EVENT_ON_MAP_CHANGE has fired')
+    print('PLAYER_EVENT_ON_MAP_CHANGE has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_EQUIP(event, player, item, bag, slot)
     functionTested[29] = 1
-    print('PLAYER_EVENT_ON_EQUIP has fired')
+    print('PLAYER_EVENT_ON_EQUIP has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_FIRST_LOGIN(event, player)
     functionTested[30] = 1
-    print('PLAYER_EVENT_ON_FIRST_LOGIN has fired')
+    print('PLAYER_EVENT_ON_FIRST_LOGIN has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_CAN_USE_ITEM(event, player, itemEntry) -- Can return InventoryResult enum value
     functionTested[31] = 1
-    print('PLAYER_EVENT_ON_CAN_USE_ITEM has fired')
+    print('PLAYER_EVENT_ON_CAN_USE_ITEM has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_LOOT_ITEM(event, player, item, count)
     functionTested[32] = 1
-    print('PLAYER_EVENT_ON_LOOT_ITEM has fired')
+    print('PLAYER_EVENT_ON_LOOT_ITEM has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_ENTER_COMBAT(event, player, enemy)
     functionTested[33] = 1
-    print('PLAYER_EVENT_ON_ENTER_COMBAT has fired')
+    print('PLAYER_EVENT_ON_ENTER_COMBAT has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_LEAVE_COMBAT(event, player)
     functionTested[34] = 1
-    print('PLAYER_EVENT_ON_LEAVE_COMBAT has fired')
+    print('PLAYER_EVENT_ON_LEAVE_COMBAT has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_REPOP(event, player)
-    print('PLAYER_EVENT_ON_REPOP has fired')
+    print('PLAYER_EVENT_ON_REPOP has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
     functionTested[35] = 1
 end
 
 local function function_PLAYER_EVENT_ON_RESURRECT(event, player)
     functionTested[36] = 1
-    print('PLAYER_EVENT_ON_RESURRECT has fired')
+    print('PLAYER_EVENT_ON_RESURRECT has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_LOOT_MONEY(event, player, amount)
     functionTested[37] = 1
-    print('PLAYER_EVENT_ON_LOOT_MONEY has fired')
+    print('PLAYER_EVENT_ON_LOOT_MONEY has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_QUEST_ABANDON(event, player, questId)
     functionTested[38] = 1
-    print('PLAYER_EVENT_ON_QUEST_ABANDON has fired')
+    print('PLAYER_EVENT_ON_QUEST_ABANDON has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_LEARN_TALENTS(event, player, talentId, talentRank, spellid)
     functionTested[39] = 1
-    print('PLAYER_EVENT_ON_LEARN_TALENTS has fired')
+    print('PLAYER_EVENT_ON_LEARN_TALENTS has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- player is nil if command used from console. Can return false
-    print('PLAYER_EVENT_ON_COMMAND has fired')
+    print('PLAYER_EVENT_ON_COMMAND has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
+    print('command: '..command)
     if command == "resetluatest" then
         for n = 1,43,1 do
             functionTested[n] = 0
+            status_EVENT[n] = nil
         end
 
         --hardcoded marking as done what doesn't exist
@@ -306,8 +433,9 @@ local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- playe
 end
 
 local function function_PLAYER_EVENT_ON_PET_SPAWNED(event, player, pet)
-    print('PLAYER_EVENT_ON_PET_SPAWNED has fired')
     functionTested[43] = 1
+    print('PLAYER_EVENT_ON_PET_SPAWNED has fired:')
+    print('event: '..event..'  playername: '..player:GetName())
 end
 
 
