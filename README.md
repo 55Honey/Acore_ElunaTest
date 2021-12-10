@@ -12,22 +12,29 @@ The ElunaLua module itself usually doesn't require much setup/config. Just speci
 If the directory was not changed in the ElunaLua config, add the .lua script to your `../lua_scripts/` directory as a subfolder of the worldserver.
 
 
-## Admin Usage:
+## Tester Usage:
+- Apply the sql to add the testing NPC
 
 - Trigger the events listed below.
 - Receive a message in the worldserver console whenever a hook fires.
 
+- `.npc add temp 299`
+- Engage in combat. Leave combat. Kill the wolf. These must create 1 print each in the worldserver console: CreatureOnEnterCombat, CreatureOnLeaveCombat, CreatureOnDied
+
+- `.npc add temp 1199000
+- Right-Clicking Chromie must print GOSSIP_EVENT_ON_HELLO. 
+- Selecting the "Test" gossip must print GOSSIP_EVENT_ON_SELECT.
+
 Commands:
 
-- `luatest` to list all events which weren't tested in this session.
+- `playertest` to list all playerevents which weren't tested in this session.
 - `resetluatest` to start an new session.
 
 ![image](https://user-images.githubusercontent.com/71938210/139537206-365dff58-72f4-4a6b-8975-7f02ccf5dbbf.png)
 ![image](https://user-images.githubusercontent.com/71938210/139540053-27c1a37d-f55b-4a69-bad6-8922b16885b0.png)
 
 
-
-## Currently listed events:
+## Currently listed player events:
 
 - PLAYER_EVENT_ON_CHARACTER_CREATE = 1        --(event, player)
 - PLAYER_EVENT_ON_CHARACTER_DELETE = 2        --(event, guid)

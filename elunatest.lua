@@ -397,7 +397,11 @@ end
 
 local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- player is nil if command used from console. Can return false
     print('PLAYER_EVENT_ON_COMMAND has fired:')
-    print('event: '..event..'  playername: '..player:GetName())
+    if player == nil then
+        print('event: '..event..'  playername: Console')
+    else
+        print('event: '..event..'  playername: '..player:GetName())
+    end
     print('command: '..command)
     if command == "resetluatest" then
         for n = 1,43,1 do
@@ -411,7 +415,7 @@ local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- playe
         playerFunctionTested[42] = 1
         return false
 
-    elseif command == "luatest" then
+    elseif command == "playertest" then
         local todoString = ''
         for n = 1,43,1 do
             if playerFunctionTested[n] == 0 then
@@ -486,15 +490,18 @@ RegisterPlayerEvent(PLAYER_EVENT_ON_PET_SPAWNED, function_PLAYER_EVENT_ON_PET_SP
 
 
 ------------------------------------------------------------------------------------------------
--- GOSSIPEVENTS
+-- CREATURE GOSSIP EVENTS
 ------------------------------------------------------------------------------------------------
 
 local GOSSIP_EVENT_ON_HELLO = 1
 local GOSSIP_EVENT_ON_SELECT = 2
+local OPTION_ICON_CHAT = 0
 
 local function GossipTestHello(event, player, object)
     print('GOSSIP_EVENT_ON_HELLO fired')
     print('event: '..event..'  playername: '..player:GetName())
+    player:GossipMenuAddItem(OPTION_ICON_CHAT, "Test", 1199000, 0)
+    player:GossipSendMenu(1, object, 0)
 end
 
 local function GossipTestSelect(event, player, object, sender, intid, code, menu_id)
@@ -503,5 +510,29 @@ local function GossipTestSelect(event, player, object, sender, intid, code, menu
 end
 
 
-RegisterCreatureGossipEvent(1112002, GOSSIP_EVENT_ON_SELECT, GossipTestSelect)
-RegisterCreatureGossipEvent(1112002, GOSSIP_EVENT_ON_HELLO, GossipTestHello)
+RegisterCreatureGossipEvent(1199000, GOSSIP_EVENT_ON_SELECT, GossipTestSelect)
+RegisterCreatureGossipEvent(1199000, GOSSIP_EVENT_ON_HELLO, GossipTestHello)
+
+
+------------------------------------------------------------------------------------------------
+-- CREATURE EVENTS
+------------------------------------------------------------------------------------------------
+
+local function CreatureOnEnterCombat(event, creature, target)
+    print('CreatureOnEnterCombat fired (1)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function CreatureOnLeaveCombat(event, creature)
+    print('CreatureOnLeaveCombat fired (2)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function CreatureOnDied(event, creature)
+    print('CreatureOnDied fired (4)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+RegisterCreatureEvent(299, 1, CreatureOnEnterCombat)
+RegisterCreatureEvent(299, 2, CreatureOnLeaveCombat)
+RegisterCreatureEvent(299, 4, CreatureOnDied)
