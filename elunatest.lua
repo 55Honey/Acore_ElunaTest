@@ -14,6 +14,51 @@
 --               -  add this script to ../lua_scripts/
 ------------------------------------------------------------------------------------------------
 
+local combatNpcEntry = 299
+local gossipNpcEntry = 1199000
+
+
+-- Creature Init:
+local creatureFunctionTested = {}
+
+--init all functions untested
+for n = 1,37,1 do
+    creatureFunctionTested[n] = 0
+end
+--hardcoded marking as done what doesn't exist
+local function solveNonExistantCreatureEvents()
+    creatureFunctionTested[11] = 1
+    creatureFunctionTested[16] = 1
+    creatureFunctionTested[17] = 1
+    creatureFunctionTested[18] = 1
+    creatureFunctionTested[25] = 1
+    creatureFunctionTested[28] = 1
+    creatureFunctionTested[29] = 1
+    creatureFunctionTested[32] = 1
+    creatureFunctionTested[33] = 1
+end
+
+solveNonExistantCreatureEvents()
+
+-- Player Init:
+local playerFunctionTested = {}
+local status_EVENT = {}
+local n
+
+--init all functions untested
+for n = 1,43,1 do
+    playerFunctionTested[n] = 0
+    status_EVENT[n] = nil
+end
+
+--hardcoded marking as done what doesn't exist
+local function solveNonExistantPlayerEvents()
+    playerFunctionTested[40] = 1
+    playerFunctionTested[41] = 1
+end
+
+solveNonExistantPlayerEvents()
+
 ------------------------------------------------------------------------------------------------
 -- PLAYEREVENTS
 ------------------------------------------------------------------------------------------------
@@ -63,21 +108,6 @@ PLAYER_EVENT_ON_LEARN_TALENTS = 39          --(event, player, talentId, talentRa
 PLAYER_EVENT_ON_COMMAND = 42                --(event, player, command) - player is nil if command used from console. Can return false
 PLAYER_EVENT_ON_PET_SPAWNED = 43            --(event, player, pet)
 
-
-local playerFunctionTested = {}
-local status_EVENT = {}
-local n
-
---init all functions untested
-for n = 1,43,1 do
-    playerFunctionTested[n] = 0
-    status_EVENT[n] = nil
-end
---hardcoded marking as done what doesn't exist
-playerFunctionTested[40] = 1
-playerFunctionTested[41] = 1
-
-
 local function function_PLAYER_EVENT_ON_CHARACTER_CREATE(event, player)
     playerFunctionTested[1] = 1
     print('PLAYER_EVENT_ON_CHARACTER_CREATE has fired:')
@@ -87,7 +117,7 @@ end
 local function function_PLAYER_EVENT_ON_CHARACTER_DELETE(event, guid)
     playerFunctionTested[2] = 1
     print('PLAYER_EVENT_ON_CHARACTER_DELETE has fired:')
-    print('event: '..event..'  playername: '..guid())
+    print('event: '..event..'  player GUID: '..guid)
 end
 
 local function function_PLAYER_EVENT_ON_LOGIN(event, player)
@@ -408,10 +438,14 @@ local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- playe
             playerFunctionTested[n] = 0
             status_EVENT[n] = nil
         end
+        for n = 1,37,1 do
+            creatureFunctionTested[n] = 0
+        end
 
         --hardcoded marking as done what doesn't exist
-        playerFunctionTested[40] = 1
-        playerFunctionTested[41] = 1
+        solveNonExistantPlayerEvents()
+        solveNonExistantCreatureEvents()
+
         playerFunctionTested[42] = 1
         return false
 
@@ -420,7 +454,27 @@ local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- playe
         for n = 1,43,1 do
             if playerFunctionTested[n] == 0 then
                 if todoString == '' then
-                    todoString = 'Remaining player events: '..n
+                    todoString = 'Untested player events: '..n
+                else
+                    todoString = todoString..', '..n
+                end
+            end
+        end
+
+        if player == nil then
+            print(todoString)
+        else
+            player:SendBroadcastMessage(todoString)
+        end
+        playerFunctionTested[42] = 1
+        return false
+
+    elseif command == "creaturetest" then
+        local todoString = ''
+        for n = 1,37,1 do
+            if creatureFunctionTested[n] == 0 then
+                if todoString == '' then
+                    todoString = 'Untested creature events: '..n
                 else
                     todoString = todoString..', '..n
                 end
@@ -500,7 +554,7 @@ local OPTION_ICON_CHAT = 0
 local function GossipTestHello(event, player, object)
     print('GOSSIP_EVENT_ON_HELLO fired')
     print('event: '..event..'  playername: '..player:GetName())
-    player:GossipMenuAddItem(OPTION_ICON_CHAT, "Test", 1199000, 0)
+    player:GossipMenuAddItem(OPTION_ICON_CHAT, "Test", gossipNpcEntry, 0)
     player:GossipSendMenu(1, object, 0)
 end
 
@@ -510,29 +564,243 @@ local function GossipTestSelect(event, player, object, sender, intid, code, menu
 end
 
 
-RegisterCreatureGossipEvent(1199000, GOSSIP_EVENT_ON_SELECT, GossipTestSelect)
-RegisterCreatureGossipEvent(1199000, GOSSIP_EVENT_ON_HELLO, GossipTestHello)
+RegisterCreatureGossipEvent(gossipNpcEntry, GOSSIP_EVENT_ON_SELECT, GossipTestSelect)
+RegisterCreatureGossipEvent(gossipNpcEntry, GOSSIP_EVENT_ON_HELLO, GossipTestHello)
 
 
 ------------------------------------------------------------------------------------------------
 -- CREATURE EVENTS
 ------------------------------------------------------------------------------------------------
+CREATURE_EVENT_ON_ENTER_COMBAT = 1
+CREATURE_EVENT_ON_LEAVE_COMBAT = 2
+CREATURE_EVENT_ON_TARGET_DIED = 3
+CREATURE_EVENT_ON_DIED = 4
+CREATURE_EVENT_ON_SPAWN = 5
+CREATURE_EVENT_ON_REACH_WP = 6
+CREATURE_EVENT_ON_AIUPDATE = 7
+CREATURE_EVENT_ON_RECEIVE_EMOTE = 8
+CREATURE_EVENT_ON_DAMAGE_TAKEN = 9
+CREATURE_EVENT_ON_PRE_COMBAT = 10
+-- 11: unused
+CREATURE_EVENT_ON_OWNER_ATTACKED = 12
+CREATURE_EVENT_ON_OWNER_ATTACKED_AT = 13
+CREATURE_EVENT_ON_HIT_BY_SPELL = 14
+CREATURE_EVENT_ON_SPELL_HIT_TARGET = 15
+-- 16: unused
+-- 17: unused
+-- 18: unused
+CREATURE_EVENT_ON_JUST_SUMMONED_CREATURE = 19
+CREATURE_EVENT_ON_SUMMONED_CREATURE_DESPAWN = 20
+CREATURE_EVENT_ON_SUMMONED_CREATURE_DIED = 21
+CREATURE_EVENT_ON_SUMMONED = 22
+CREATURE_EVENT_ON_RESET = 23
+CREATURE_EVENT_ON_REACH_HOME = 24
+-- 25: unused
+CREATURE_EVENT_ON_CORPSE_REMOVED = 26
+CREATURE_EVENT_ON_MOVE_IN_LOS = 27
+-- 28: unused
+-- 29: unused
+CREATURE_EVENT_ON_DUMMY_EFFECT = 30
+CREATURE_EVENT_ON_QUEST_ACCEPT = 31
+-- 32: unused
+-- 33: unused
+CREATURE_EVENT_ON_QUEST_REWARD = 34
+CREATURE_EVENT_ON_DIALOG_STATUS = 35
+CREATURE_EVENT_ON_ADD = 36
+CREATURE_EVENT_ON_REMOVE = 37
 
-local function CreatureOnEnterCombat(event, creature, target)
-    print('CreatureOnEnterCombat fired (1)')
+
+local function function_CREATURE_EVENT_ON_ENTER_COMBAT(event, creature, target)
+    creatureFunctionTested[1] = 1
+    print('CREATURE_EVENT_ON_ENTER_COMBAT fired (1)')
     print('event: '..event..'  creature: '..creature:GetName())
 end
 
-local function CreatureOnLeaveCombat(event, creature)
-    print('CreatureOnLeaveCombat fired (2)')
+local function function_CREATURE_EVENT_ON_LEAVE_COMBAT(event, creature)
+    creatureFunctionTested[2] = 1
+    print('CREATURE_EVENT_ON_LEAVE_COMBAT fired (2)')
     print('event: '..event..'  creature: '..creature:GetName())
 end
 
-local function CreatureOnDied(event, creature)
-    print('CreatureOnDied fired (4)')
+local function function_CREATURE_EVENT_ON_DIED(event, creature, victim)
+    creatureFunctionTested[3] = 1
+    print('CREATURE_EVENT_ON_TARGET_DIED fired (3)')
     print('event: '..event..'  creature: '..creature:GetName())
 end
 
-RegisterCreatureEvent(299, 1, CreatureOnEnterCombat)
-RegisterCreatureEvent(299, 2, CreatureOnLeaveCombat)
-RegisterCreatureEvent(299, 4, CreatureOnDied)
+local function function_CREATURE_EVENT_ON_DIED(event, creature, killer)
+    creatureFunctionTested[4] = 1
+    print('CREATURE_EVENT_ON_DIED fired (4)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_SPAWN(event, creature)
+    creatureFunctionTested[5] = 1
+    print('CREATURE_EVENT_ON_SPAWN fired (5)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_REACH_WP(event, creature, type, id)
+    creatureFunctionTested[6] = 1
+    print('CREATURE_EVENT_ON_REACH_WP fired (6')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_AIUPDATE(event, creature, diff)
+    creatureFunctionTested[7] = 1
+    print('CREATURE_EVENT_ON_AIUPDATE fired (7)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_RECEIVE_EMOTE(event, creature, player, emoteid)
+    creatureFunctionTested[8] = 1
+    print('CREATURE_EVENT_ON_RECEIVE_EMOTE fired (8)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_DAMAGE_TAKEN(event, creature, attacker, damage)
+    creatureFunctionTested[9] = 1
+    print('CREATURE_EVENT_ON_DAMAGE_TAKEN fired (9)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_PRE_COMBAT(event, creature, target)
+    creatureFunctionTested[10] = 1
+    print('CREATURE_EVENT_ON_PRE_COMBAT fired (10)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_OWNER_ATTACKED(event, creature, target)
+    creatureFunctionTested[12] = 1
+    print('CREATURE_EVENT_ON_OWNER_ATTACKED fired (12)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_OWNER_ATTACKED_AT(event, creature, attacker)
+    creatureFunctionTested[13] = 1
+    print('CREATURE_EVENT_ON_OWNER_ATTACKED_AT fired (13)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_HIT_BY_SPELL(event, creature, caster, spellid)
+    creatureFunctionTested[14] = 1
+    print('CREATURE_EVENT_ON_HIT_BY_SPELL fired (14)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_SPELL_HIT_TARGET(event, creature, target, spellid)
+    creatureFunctionTested[15] = 1
+    print('CREATURE_EVENT_ON_SPELL_HIT_TARGET fired (15)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_JUST_SUMMONED_CREATURE(event, creature, summon)
+    creatureFunctionTested[19] = 1
+    print('CREATURE_EVENT_ON_JUST_SUMMONED_CREATURE fired (19)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_SUMMONED_CREATURE_DESPAWN(event, creature, summon)
+    creatureFunctionTested[20] = 1
+    print('CREATURE_EVENT_ON_SUMMONED_CREATURE_DESPAWN fired (20)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+local function function_CREATURE_EVENT_ON_SUMMONED_CREATURE_DIED(event, creature, summon, killer)
+    creatureFunctionTested[21] = 1
+    print('CREATURE_EVENT_ON_SUMMONED_CREATURE_DIED fired (21)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_SUMMONED(event, creature, summoner)
+    creatureFunctionTested[22] = 1
+    print('CREATURE_EVENT_ON_SUMMONED fired (22)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_RESET(event, creature)
+    creatureFunctionTested[23] = 1
+    print('CREATURE_EVENT_ON_RESET fired (23)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+local function function_CREATURE_EVENT_ON_REACH_HOME(event, creature)
+    creatureFunctionTested[24] = 1
+    print('CREATURE_EVENT_ON_REACH_HOME fired (24)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_CORPSE_REMOVED(event, creature, respawndelay)
+    creatureFunctionTested[26] = 1
+    print('CREATURE_EVENT_ON_CORPSE_REMOVED fired (26)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_MOVE_IN_LOS(event, creature, unit)
+    creatureFunctionTested[27] = 1
+    print('CREATURE_EVENT_ON_MOVE_IN_LOS fired (27)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_DUMMY_EFFECT(event, caster, spellid, effindex, creature)
+    creatureFunctionTested[30] = 1
+    print('CREATURE_EVENT_ON_DUMMY_EFFECT fired (30)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_QUEST_ACCEPT(event, player, creature, quest)
+    creatureFunctionTested[31] = 1
+    print('CREATURE_EVENT_ON_QUEST_ACCEPT fired (31)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_QUEST_REWARD(event, player, creature, quest, opt)
+    creatureFunctionTested[34] = 1
+    print('CREATURE_EVENT_ON_QUEST_REWARD fired (34)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_DIALOG_STATUS(event, player, creature)
+    creatureFunctionTested[35] = 1
+    print('CREATURE_EVENT_ON_DIALOG_STATUS fired (35)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_ADD(event, creature)
+    creatureFunctionTested[36] = 1
+    print('CREATURE_EVENT_ON_ADD fired (36)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+local function function_CREATURE_EVENT_ON_REMOVE(event, creature)
+    creatureFunctionTested[37] = 1
+    print('CREATURE_EVENT_ON_REMOVE fired (37)')
+    print('event: '..event..'  creature: '..creature:GetName())
+end
+
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_ENTER_COMBAT, function_CREATURE_EVENT_ON_ENTER_COMBAT)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_LEAVE_COMBAT, function_CREATURE_EVENT_ON_LEAVE_COMBAT)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_TARGET_DIED, function_CREATURE_EVENT_ON_DIED)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_DIED, function_CREATURE_EVENT_ON_DIED)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_SPAWN, function_CREATURE_EVENT_ON_SPAWN)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_REACH_WP, function_CREATURE_EVENT_ON_REACH_WP)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_AIUPDATE, function_CREATURE_EVENT_ON_AIUPDATE)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_RECEIVE_EMOTE, function_CREATURE_EVENT_ON_RECEIVE_EMOTE)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_DAMAGE_TAKEN, function_CREATURE_EVENT_ON_DAMAGE_TAKEN)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_PRE_COMBAT, function_CREATURE_EVENT_ON_PRE_COMBAT)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_OWNER_ATTACKED, function_CREATURE_EVENT_ON_OWNER_ATTACKED)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_OWNER_ATTACKED_AT, function_CREATURE_EVENT_ON_OWNER_ATTACKED_AT)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_HIT_BY_SPELL, function_CREATURE_EVENT_ON_HIT_BY_SPELL)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_SPELL_HIT_TARGET, function_CREATURE_EVENT_ON_SPELL_HIT_TARGET)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_JUST_SUMMONED_CREATURE, function_CREATURE_EVENT_ON_JUST_SUMMONED_CREATURE)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_SUMMONED_CREATURE_DESPAWN, function_CREATURE_EVENT_ON_SUMMONED_CREATURE_DESPAWN)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_SUMMONED_CREATURE_DIED, function_CREATURE_EVENT_ON_SUMMONED_CREATURE_DIED)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_SUMMONED, function_CREATURE_EVENT_ON_SUMMONED)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_RESET, function_CREATURE_EVENT_ON_RESET)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_REACH_HOME, function_CREATURE_EVENT_ON_REACH_HOME)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_CORPSE_REMOVED, function_CREATURE_EVENT_ON_CORPSE_REMOVED)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_MOVE_IN_LOS, function_CREATURE_EVENT_ON_MOVE_IN_LOS)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_DUMMY_EFFECT, function_CREATURE_EVENT_ON_DUMMY_EFFECT)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_QUEST_ACCEPT, function_CREATURE_EVENT_ON_QUEST_ACCEPT)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_QUEST_REWARD, function_CREATURE_EVENT_ON_QUEST_REWARD)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_DIALOG_STATUS, function_CREATURE_EVENT_ON_DIALOG_STATUS)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_ADD, function_CREATURE_EVENT_ON_ADD)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_REMOVE, function_CREATURE_EVENT_ON_REMOVE)
