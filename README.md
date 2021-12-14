@@ -28,6 +28,7 @@ If the directory was not changed in the ElunaLua config, add the .lua script to 
 Commands:
 
 - `playertest` to list all playerevents which weren't tested in this session.
+- `creaturetest` to list all creatureevents which weren't tested in this session.
 - `resetluatest` to start an new session.
 
 ![image](https://user-images.githubusercontent.com/71938210/139537206-365dff58-72f4-4a6b-8975-7f02ccf5dbbf.png)
