@@ -491,6 +491,7 @@ local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- playe
     end
 
     playerFunctionTested[42] = 1
+    return
 end
 
 local function function_PLAYER_EVENT_ON_PET_SPAWNED(event, player, pet)
