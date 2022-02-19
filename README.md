@@ -21,7 +21,7 @@ If the directory was not changed in the ElunaLua config, add the .lua script to 
 - `.npc add temp 299`
 - Trigger all events for the spawned wolf.
 
-- `.npc add temp 1199000
+- `.npc add temp 1199000`
 - Right-Clicking Chromie must print GOSSIP_EVENT_ON_HELLO. 
 - Selecting the "Test" gossip must print GOSSIP_EVENT_ON_SELECT.
 

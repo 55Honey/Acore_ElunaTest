@@ -105,7 +105,7 @@ PLAYER_EVENT_ON_QUEST_ABANDON = 38          --(event, player, questId)
 PLAYER_EVENT_ON_LEARN_TALENTS = 39          --(event, player, talentId, talentRank, spellid)
 -- UNUSED                     = 40          --(event, player)
 -- UNUSED                     = 41          --(event, player)
-PLAYER_EVENT_ON_COMMAND = 42                --(event, player, command) - player is nil if command used from console. Can return false
+PLAYER_EVENT_ON_COMMAND = 42                --(event, player, command, chatHandler) - player is nil if command used from console. Can return false
 PLAYER_EVENT_ON_PET_SPAWNED = 43            --(event, player, pet)
 
 local function function_PLAYER_EVENT_ON_CHARACTER_CREATE(event, player)
@@ -425,14 +425,14 @@ local function function_PLAYER_EVENT_ON_LEARN_TALENTS(event, player, talentId, t
     print('event: '..event..'  playername: '..player:GetName())
 end
 
-local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- player is nil if command used from console. Can return false
-    print('PLAYER_EVENT_ON_COMMAND has fired:')
+local function function_PLAYER_EVENT_ON_COMMAND(event, player, command, chatHandler) -- player is nil if command used from console. Can return false
+    chatHandler:SendSysMessage('PLAYER_EVENT_ON_COMMAND has fired:')
     if player == nil then
-        print('event: '..event..'  playername: Console')
+        chatHandler:SendSysMessage('event: '..event..'  playername: Console')
     else
-        print('event: '..event..'  playername: '..player:GetName())
+        chatHandler:SendSysMessage('event: '..event..'  playername: '..player:GetName())
     end
-    print('command: '..command)
+    chatHandler:SendSysMessage('command: '..command)
     if command == "resetluatest" then
         for n = 1,43,1 do
             playerFunctionTested[n] = 0
@@ -461,11 +461,8 @@ local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- playe
             end
         end
 
-        if player == nil then
-            print(todoString)
-        else
-            player:SendBroadcastMessage(todoString)
-        end
+        chatHandler:SendSysMessage(todoString)
+
         playerFunctionTested[42] = 1
         return false
 
@@ -481,11 +478,8 @@ local function function_PLAYER_EVENT_ON_COMMAND(event, player, command) -- playe
             end
         end
 
-        if player == nil then
-            print(todoString)
-        else
-            player:SendBroadcastMessage(todoString)
-        end
+        chatHandler:SendSysMessage(todoString)
+
         playerFunctionTested[42] = 1
         return false
     end
