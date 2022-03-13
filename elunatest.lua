@@ -10,13 +10,35 @@
 
 -- Test Eluna hooks in Azerothcore
 ------------------------------------------------------------------------------------------------
--- ADMIN GUIDE:  -  compile the core with ElunaLua module
---               -  add this script to ../lua_scripts/
+-- ADMIN GUIDE: - compile the core with ElunaLua module
+--              - add this script to ../lua_scripts/
+------------------------------------------------------------------------------------------------
+-- USAGE:       - Create a Human Warlock named Luatest and login
+--              - Wait
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+-- Config
 ------------------------------------------------------------------------------------------------
 
 local combatNpcEntry = 299
 local gossipNpcEntry = 1199000
 
+local nonExistantCreatureEvents = {11,16,17,18,25,28,29,32,33 }     -- in the range of 1-37
+local nonExistantPlayerEvents = {40,41}                             -- in the range of 1-43
+
+
+------------------------------------------------------------------------------------------------
+-- /Config
+------------------------------------------------------------------------------------------------
+
+local cancelEvent
+local nextTest = 1
+local ChromieObject
+local ChromieGuid
+
+local testsDone = {}
+local startupTime = tostring(GetGameTime())
 
 -- Creature Init:
 local creatureFunctionTested = {}
@@ -25,17 +47,12 @@ local creatureFunctionTested = {}
 for n = 1,37,1 do
     creatureFunctionTested[n] = 0
 end
+
 --hardcoded marking as done what doesn't exist
 local function solveNonExistantCreatureEvents()
-    creatureFunctionTested[11] = 1
-    creatureFunctionTested[16] = 1
-    creatureFunctionTested[17] = 1
-    creatureFunctionTested[18] = 1
-    creatureFunctionTested[25] = 1
-    creatureFunctionTested[28] = 1
-    creatureFunctionTested[29] = 1
-    creatureFunctionTested[32] = 1
-    creatureFunctionTested[33] = 1
+    for _,value in ipairs(nonExistantCreatureEvents) do
+        creatureFunctionTested[value] = 1
+    end
 end
 
 solveNonExistantCreatureEvents()
@@ -53,11 +70,27 @@ end
 
 --hardcoded marking as done what doesn't exist
 local function solveNonExistantPlayerEvents()
-    playerFunctionTested[40] = 1
-    playerFunctionTested[41] = 1
+    for _,value in ipairs(nonExistantPlayerEvents) do
+        playerFunctionTested[value] = 1
+    end
 end
 
 solveNonExistantPlayerEvents()
+
+local function log(line, chatHandler, logToConsole)
+    local f = io.open(debug.getinfo(1).source:match("@?(.*/)").."/"..startupTime.."_luatest.log", "a")
+    f:write(line)
+    f:write("\n")
+    f:close()
+
+    if logToConsole == nil or logToConsole == true then
+        if chatHandler ~= nil then
+            chatHandler:SendSysMessage("[LuaTest] " .. line)
+        else
+            print("[LuaTest] " .. line)
+        end
+    end
+end
 
 ------------------------------------------------------------------------------------------------
 -- PLAYEREVENTS
@@ -219,6 +252,9 @@ local function function_PLAYER_EVENT_ON_TALENTS_RESET(event, player, noCost)
 end
 
 local function function_PLAYER_EVENT_ON_CHAT(event, player, msg, Type, lang) -- Can return false, newMessage
+    if player:GetName() == 'Luatest' then
+        return
+    end
     print('PLAYER_EVENT_ON_CHAT has fired:')
     print('event: '..event..'  playername: '..player:GetName()..'  msg: '..msg..'  Type: '..Type..'  lang: '..lang)
     if status_EVENT[18] == nil then
@@ -547,6 +583,9 @@ local GOSSIP_EVENT_ON_SELECT = 2
 local OPTION_ICON_CHAT = 0
 
 local function GossipTestHello(event, player, object)
+    if player:GetName() == 'Luatest' then
+        return
+    end
     print('GOSSIP_EVENT_ON_HELLO fired')
     print('event: '..event..'  playername: '..player:GetName())
     player:GossipMenuAddItem(OPTION_ICON_CHAT, "Test", gossipNpcEntry, 0)
@@ -609,6 +648,13 @@ local function function_CREATURE_EVENT_ON_ENTER_COMBAT(event, creature, target)
     creatureFunctionTested[1] = 1
     print('CREATURE_EVENT_ON_ENTER_COMBAT fired (1)')
     print('event: '..event..'  creature: '..creature:GetName())
+    if nextTest == 5 then
+        target:Say("Combat started.",0)
+        log('--------------------------------------------------')
+        log('-- Test 5                                       --')
+        log('1) Creature ON_ENTER_COMBAT triggered')
+        nextTest = '5b'
+    end
 end
 
 local function function_CREATURE_EVENT_ON_LEAVE_COMBAT(event, creature)
@@ -617,7 +663,7 @@ local function function_CREATURE_EVENT_ON_LEAVE_COMBAT(event, creature)
     print('event: '..event..'  creature: '..creature:GetName())
 end
 
-local function function_CREATURE_EVENT_ON_DIED(event, creature, victim)
+local function function_CREATURE_EVENT_ON_TARGET_DIED(event, creature, victim)
     creatureFunctionTested[3] = 1
     print('CREATURE_EVENT_ON_TARGET_DIED fired (3)')
     print('event: '..event..'  creature: '..creature:GetName())
@@ -642,9 +688,11 @@ local function function_CREATURE_EVENT_ON_REACH_WP(event, creature, type, id)
 end
 
 local function function_CREATURE_EVENT_ON_AIUPDATE(event, creature, diff)
-    creatureFunctionTested[7] = 1
-    print('CREATURE_EVENT_ON_AIUPDATE fired (7)')
-    print('event: '..event..'  creature: '..creature:GetName())
+    if creatureFunctionTested[7] ~= 1 then
+        creatureFunctionTested[7] = 1
+        print('CREATURE_EVENT_ON_AIUPDATE fired (7)')
+        print('event: '..event..'  creature: '..creature:GetName())
+    end
 end
 
 local function function_CREATURE_EVENT_ON_RECEIVE_EMOTE(event, creature, player, emoteid)
@@ -657,12 +705,19 @@ local function function_CREATURE_EVENT_ON_DAMAGE_TAKEN(event, creature, attacker
     creatureFunctionTested[9] = 1
     print('CREATURE_EVENT_ON_DAMAGE_TAKEN fired (9)')
     print('event: '..event..'  creature: '..creature:GetName())
+    if nextTest == '5c' then
+        attacker:Say("Damage was taken",0)
+        log('3) Creature EVENT_ON_DAMAGE_TAKEN triggered')
+        nextTest = '5d'
+    end
 end
 
 local function function_CREATURE_EVENT_ON_PRE_COMBAT(event, creature, target)
-    creatureFunctionTested[10] = 1
-    print('CREATURE_EVENT_ON_PRE_COMBAT fired (10)')
-    print('event: '..event..'  creature: '..creature:GetName())
+    if creatureFunctionTested[10] ~= 1 then
+        creatureFunctionTested[10] = 1
+        print('CREATURE_EVENT_ON_PRE_COMBAT fired (10)')
+        print('event: '..event..'  creature: '..creature:GetName())
+    end
 end
 
 local function function_CREATURE_EVENT_ON_OWNER_ATTACKED(event, creature, target)
@@ -681,6 +736,11 @@ local function function_CREATURE_EVENT_ON_HIT_BY_SPELL(event, creature, caster, 
     creatureFunctionTested[14] = 1
     print('CREATURE_EVENT_ON_HIT_BY_SPELL fired (14)')
     print('event: '..event..'  creature: '..creature:GetName())
+    if nextTest == '5b' then
+        caster:Say("Spell has hit.",0)
+        log('2) Creature ON_HIT_BY_SPELL triggered')
+        nextTest = '5c'
+    end
 end
 
 local function function_CREATURE_EVENT_ON_SPELL_HIT_TARGET(event, creature, target, spellid)
@@ -773,7 +833,7 @@ end
 
 RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_ENTER_COMBAT, function_CREATURE_EVENT_ON_ENTER_COMBAT)
 RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_LEAVE_COMBAT, function_CREATURE_EVENT_ON_LEAVE_COMBAT)
-RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_TARGET_DIED, function_CREATURE_EVENT_ON_DIED)
+RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_TARGET_DIED, function_CREATURE_EVENT_ON_TARGET_DIED)
 RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_DIED, function_CREATURE_EVENT_ON_DIED)
 RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_SPAWN, function_CREATURE_EVENT_ON_SPAWN)
 RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_REACH_WP, function_CREATURE_EVENT_ON_REACH_WP)
@@ -799,3 +859,99 @@ RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_QUEST_REWARD, function_C
 RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_DIALOG_STATUS, function_CREATURE_EVENT_ON_DIALOG_STATUS)
 RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_ADD, function_CREATURE_EVENT_ON_ADD)
 RegisterCreatureEvent(combatNpcEntry, CREATURE_EVENT_ON_REMOVE, function_CREATURE_EVENT_ON_REMOVE)
+
+--worldobject:ToPlayer():RemoveEventById(cancelEvent)
+
+------------------------------------------------------------------------------------------------
+-- Tests
+------------------------------------------------------------------------------------------------
+-- Test 5)
+local function teleportToWolf5(eventid, delay, repeats, worldobject)
+    worldobject:ToPlayer():Say("Teleported to Wolfs. Cast Shadowbolt (Rank 1) on a wolf.",0)
+end
+
+------------------------------------------------------------------------------------------------
+-- Test 4)
+local function gossipTestSelect4(event, player, object, sender, intid, code, menu_id)
+    player:Say("Gossip tests concluded.",0)
+    log('--------------------------------------------------')
+    log('-- Test 4                                       --')
+    log('Gossip OnSelect succesfully triggered.')
+    ClearCreatureGossipEvents(gossipNpcEntry)
+    nextTest = 5
+    player:Teleport(0,-8975,-80,87,0.38)
+    cancelEvent = player:RegisterEvent(teleportToWolf5,5000,1)
+end
+
+------------------------------------------------------------------------------------------------
+-- Test 3)
+local function gossipTestHello3(event, player, object)
+    player:Say("Select the test-gossip to continue.",0)
+    player:GossipMenuAddItem(OPTION_ICON_CHAT, "Test", gossipNpcEntry, 0)
+    player:GossipSendMenu(1, object, 0)
+    ClearCreatureGossipEvents(gossipNpcEntry)
+    cancelEvent = RegisterCreatureGossipEvent(gossipNpcEntry, GOSSIP_EVENT_ON_SELECT, gossipTestSelect4)
+    log('--------------------------------------------------')
+    log('-- Test 3                                       --')
+    log('Gossip OnHello succesfully triggered.')
+    nextTest = 4
+end
+
+------------------------------------------------------------------------------------------------
+-- Test 2)
+local function teleportToMarissa2(eventid, delay, repeats, worldobject)
+    worldobject:ToPlayer():Say("I've been teleported and i am facing Chromie. Right-click Chromie to continue.",0)
+    cancelEvent = RegisterCreatureGossipEvent(gossipNpcEntry, GOSSIP_EVENT_ON_HELLO, gossipTestHello3)
+    log('--------------------------------------------------')
+    log('-- Test 2                                       --')
+    if worldobject:ToPlayer():GetX() < -8999 and worldobject:ToPlayer():GetX() > -9001 and worldobject:ToPlayer():GetY() < -84 and worldobject:ToPlayer():GetY() > -86 then
+        log('Player was succesfully teleported')
+    else
+        log('!!!!!! Player has wrong position: '..worldobject:ToPlayer():GetX()..', '..worldobject:ToPlayer():GetY()..'.')
+    end
+    nextTest = 3
+end
+
+------------------------------------------------------------------------------------------------
+-- Test 1)
+local function onLuatestLogin1(event, player)
+    if player:GetName() ~= 'Luatest' then
+        return
+    end
+    local errorMessage = 'A fresh human level 1 warlock character is required for testing. Logout, delete it and start over.'
+    if player:GetRace() ~= 1 or player:GetLevel() ~= 1 or player:GetClass() ~= 9 then
+        print(errorMessage)
+        return
+    end
+    player:SetLevel(60)
+    player:Teleport(0,-9000,-85,86,2.82)
+    ChromieObject = PerformIngameSpawn(1,1199000,0,0,-9004,-84,86.3,5.8)
+    ChromieGuid = ChromieObject:GetGUID()
+    cancelEvent = player:RegisterEvent(teleportToMarissa2,5000,1)
+    log('--------------------------------------------------')
+    log('-- Test 1                                       --')
+    if player:GetLevel() == 60 then
+        log('Player is Level 60.')
+    else
+        log('!!!!!! Player has wrong level: '..player:GetLevel()..'.')
+    end
+    nextTest = 2
+end
+
+cancelEvent = RegisterPlayerEvent(PLAYER_EVENT_ON_LOGIN, onLuatestLogin1)
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+-- /Tests
+------------------------------------------------------------------------------------------------
+local function CloseLua(CloseLua)
+    if ChromieGuid ~= nil then
+        local map
+        map = GetMapById(0)
+        ChromieObject = map:GetWorldObject(ChromieGuid):ToCreature()
+        ChromieObject:DespawnOrUnsummon(0)
+    end
+end
+
+local ELUNA_EVENT_ON_LUA_STATE_CLOSE = 16
+RegisterServerEvent(ELUNA_EVENT_ON_LUA_STATE_CLOSE, CloseLua, 0)
