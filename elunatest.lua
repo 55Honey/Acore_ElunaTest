@@ -737,7 +737,7 @@ local function function_CREATURE_EVENT_ON_HIT_BY_SPELL(event, creature, caster, 
     print('CREATURE_EVENT_ON_HIT_BY_SPELL fired (14)')
     print('event: '..event..'  creature: '..creature:GetName())
     if nextTest == '5b' then
-        caster:Say("Spell has hit.",0)
+        caster:Say("Spell has hit. Keep casting until target is dead.",0)
         log('2) Creature ON_HIT_BY_SPELL triggered')
         nextTest = '5c'
     end
@@ -880,7 +880,7 @@ local function gossipTestSelect4(event, player, object, sender, intid, code, men
     ClearCreatureGossipEvents(gossipNpcEntry)
     nextTest = 5
     player:Teleport(0,-8975,-80,87,0.38)
-    cancelEvent = player:RegisterEvent(teleportToWolf5,5000,1)
+    cancelEvent = player:RegisterEvent(teleportToWolf5,3000,1)
 end
 
 ------------------------------------------------------------------------------------------------
